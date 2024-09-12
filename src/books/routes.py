@@ -4,7 +4,7 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
 from fastapi import APIRouter
 from src.books.book_data import books
-from src.books.schemas import Book, BookSchema, BookUpdateModel, BookUpdateSchema
+from src.books.schemas import Book, BookUpdateModel
 from fastapi import APIRouter
 
 
