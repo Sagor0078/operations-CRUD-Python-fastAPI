@@ -1,20 +1,25 @@
+
 from fastapi import FastAPI
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from src.books.routes import book_router
+from contextlib import asynccontextmanager
+from src.db.main import initdb
 
-version = 'v1'
 
-async def life_span(app: FastAPI):
-    # Code to be executed before the application starts
+#the lifespan event
+@asynccontextmanager
+async def lifespan(app: FastAPI):    
+    await initdb()
     yield
-    # Code to be executed after the application shuts down
+    print("server is stopping")
+
+
 
 app = FastAPI(
-    title="Bookly",
-    description="A REST API for a book review web service",
-    version=version,
-    lifespan=life_span
+    lifespan=lifespan # add the lifespan event to our application
 )
 
-app.include_router(book_router, prefix=f"/api/{version}/books", tags=['books'])
-
+app.include_router(
+    book_router,
+    prefix="/books",
+    tags=['books']
+)
