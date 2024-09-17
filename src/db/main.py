@@ -23,7 +23,7 @@ async def initdb():
 # Dependency Injections
 
 async def get_session() -> AsyncSession: # type: ignore
-    ''' Dependency to provide session object'''
+    ''' Dependency to provide session object '''
     async_session = sessionmaker(
         bind = create_async_engine, class_=AsyncSession, expire_on_commit= False
     )
