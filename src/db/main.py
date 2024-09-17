@@ -1,29 +1,32 @@
 
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from sqlalchemy.orm import sessionmaker
+from sqlmodel import create_engine, text
 from src.config import Config
+from sqlmodel import SQLModel
+from src.books.models import Book
 
-# Create an async engine
-engine = create_async_engine(
-    Config.DATABASE_URL,
+
+engine = AsyncEngine(create_engine(
+    url=Config.DATABASE_URL,
     echo=True
-)
+))
 
-# Create a session factory
-async_session = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
 
 async def initdb():
+    """create our database models in the database"""
+
     async with engine.begin() as conn:
-        # Your database initialization logic here
-        statement = text("SELECT 'Hello World'")
-
-        result = await conn.execute(statement)
-
-        print(result.all())
+        await conn.run_sync(SQLModel.metadata.create_all)
 
 
+# Dependency Injections
+
+async def get_session() -> AsyncSession: # type: ignore
+    ''' Dependency to provide session object'''
+    async_session = sessionmaker(
+        bind = create_async_engine, class_=AsyncSession, expire_on_commit= False
+    )
+
+    async with async_session() as session:
+        yield session
